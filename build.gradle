@@ -1,0 +1,32 @@
+defaultTasks 'clean', 'screamCompile'
+
+allprojects {
+    group = 'org.screamingsandals.bungeelink'
+    version = '1.0.0-SNAPSHOT'
+}
+
+buildscript {
+    repositories {
+        jcenter()
+	maven {
+          url = "https://plugins.gradle.org/m2/"
+        }
+        maven {
+            url = 'https://repo.screamingsandals.org'
+        }
+    }
+    dependencies {
+	classpath 'org.screamingsandals.gradle.builder:screaming-plugin-builder:1.0.10'
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.screamingsandals.gradle.builder'
+
+    shadowJar {
+	relocate 'org.screamingsandals.lib', 'org.screamingsandals.bungeelink.lib'
+    }
+
+    sourceCompatibility = '11'
+}
