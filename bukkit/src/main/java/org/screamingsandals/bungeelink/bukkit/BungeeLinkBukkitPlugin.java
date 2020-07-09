@@ -50,6 +50,8 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
                 return;
             }
 
+            platform.initCustomPayloadStream();
+
             server.setOnlinePlayersCount(Bukkit.getOnlinePlayers().size());
             server.setMaximumPlayersCount(Bukkit.getMaxPlayers());
             server.setStatusLine(Bukkit.getMotd());

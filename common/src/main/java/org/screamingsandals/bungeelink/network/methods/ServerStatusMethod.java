@@ -82,8 +82,7 @@ public class ServerStatusMethod {
                                 res.currentPlayerCount = server.getOnlinePlayersCount();
                                 res.maximumPlayerCount = server.getMaximumPlayersCount();
                                 responseObserver.onNext(res);
-                            } catch (Throwable throwable) {
-                                throwable.printStackTrace();
+                            } catch (Throwable ignored) {
                                 // Unregister listener on fail
                                 Platform.getInstance().getUpdateServerStatusDispatcher().unregister(server, this);
                                 Platform.getInstance().getUpdateServerStatusDispatcher().unregister(whoAsked, this);
