@@ -13,6 +13,10 @@ public interface Server extends Contactable {
     @NotNull
     String getStatusLine();
 
+    void setStatusLine(@NotNull String statusLine);
+
+    void setServerStatus(@NotNull ServerStatus serverStatus);
+
     int getOnlinePlayersCount();
 
     int getMaximumPlayersCount();
