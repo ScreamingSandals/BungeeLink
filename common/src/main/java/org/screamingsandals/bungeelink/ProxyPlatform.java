@@ -10,7 +10,6 @@ import org.screamingsandals.bungeelink.servers.Server;
 import org.screamingsandals.bungeelink.utils.Encryption;
 import org.screamingsandals.lib.config.DefaultConfigBuilder;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;

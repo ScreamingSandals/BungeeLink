@@ -1,7 +1,6 @@
 package org.screamingsandals.bungeelink.network.methods;
 
 import io.grpc.MethodDescriptor;
-import io.grpc.stub.ServerCalls;
 import io.grpc.stub.StreamObserver;
 import lombok.Data;
 import org.screamingsandals.bungeelink.Platform;

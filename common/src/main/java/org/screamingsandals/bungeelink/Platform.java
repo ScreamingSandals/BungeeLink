@@ -15,7 +15,6 @@ import org.screamingsandals.bungeelink.servers.Server;
 import org.screamingsandals.bungeelink.servers.ServerManager;
 import org.screamingsandals.lib.config.ConfigAdapter;
 
-import java.io.Serializable;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 

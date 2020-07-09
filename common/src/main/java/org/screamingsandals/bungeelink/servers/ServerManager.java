@@ -45,6 +45,6 @@ public class ServerManager {
     }
 
     public void forEach(Consumer<Server> action) {
-        servers.forEach(action);
+        new ArrayList<>(servers).forEach(action);
     }
 }

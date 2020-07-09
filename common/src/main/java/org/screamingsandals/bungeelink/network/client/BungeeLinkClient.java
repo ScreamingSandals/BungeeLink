@@ -35,8 +35,28 @@ public class BungeeLinkClient {
                 .build();
     }
 
-    public <RequestT, ResponseT> ClientCall<RequestT, ResponseT> initCall(MethodDescriptor<RequestT, ResponseT> methodDescriptor) {
+    private <RequestT, ResponseT> ClientCall<RequestT, ResponseT> initCall(MethodDescriptor<RequestT, ResponseT> methodDescriptor) {
         return channel.newCall(methodDescriptor, CallOptions.DEFAULT.withCallCredentials(credentials));
+    }
+
+    public <RequestT, ResponseT> void initUnaryCall(MethodDescriptor<RequestT, ResponseT> methodDescriptor, RequestT request) {
+        initUnaryCall(methodDescriptor, request, new StreamObserver<>() {
+            @Override
+            public void onNext(ResponseT value) {
+            }
+
+            @Override
+            public void onError(Throwable t) {
+            }
+
+            @Override
+            public void onCompleted() {
+            }
+        });
+    }
+
+    public <RequestT, ResponseT> void initUnaryCall(MethodDescriptor<RequestT, ResponseT> methodDescriptor, RequestT request, StreamObserver<ResponseT> observer) {
+        ClientCalls.asyncUnaryCall(channel.newCall(methodDescriptor, CallOptions.DEFAULT.withCallCredentials(credentials)), request, observer);
     }
 
     public <RequestT, ResponseT> StreamObserver<RequestT> initStreamCall(MethodDescriptor<RequestT, ResponseT> methodDescriptor, StreamObserver<ResponseT> observer) {

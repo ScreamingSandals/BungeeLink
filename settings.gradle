@@ -5,4 +5,5 @@ include 'common'
 include 'bukkit'
 include 'bungee'
 include 'universal'
+include 'velocity'
 

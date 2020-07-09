@@ -1,16 +1,12 @@
 package org.screamingsandals.bungeelink;
 
-import io.grpc.ClientCall;
-import io.grpc.Metadata;
-import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.screamingsandals.bungeelink.api.Proxy;
 import org.screamingsandals.bungeelink.api.custom.Contactable;
 import org.screamingsandals.bungeelink.api.servers.ServerStatus;
-import org.screamingsandals.bungeelink.custom.Handshake;
+import org.screamingsandals.bungeelink.custom.CustomPayloadClientSession;
 import org.screamingsandals.bungeelink.network.client.BungeeLinkClient;
 import org.screamingsandals.bungeelink.network.methods.*;
 import org.screamingsandals.bungeelink.servers.Server;
@@ -29,7 +25,7 @@ import java.util.function.Consumer;
 public class ServerPlatform extends Platform {
     private BungeeLinkClient client;
     private ServerStatusSyncer syncer = new ServerStatusSyncer(this);
-    private StreamObserver<CustomPayloadMethod.CustomPayloadMessage> customPayloadObserver;
+    private CustomPayloadClientSession customPayloadClientSession = new CustomPayloadClientSession(this);
 
     @Override
     public boolean init() {
@@ -75,41 +71,25 @@ public class ServerPlatform extends Platform {
 
     @Override
     public void sendCustomPayload(String channel, Object message, Contactable contactable) {
-        if (customPayloadObserver != null) {
-            CustomPayloadMethod.CustomPayloadMessage msg = new CustomPayloadMethod.CustomPayloadMessage();
-            msg.setSenderType(CustomPayloadMethod.SenderType.SERVER);
-            msg.setSenderName(Objects.requireNonNull(getThisServerInformation()).getServerName());
-            msg.setChannel(channel);
-            msg.setReceiverType(contactable instanceof Proxy ? CustomPayloadMethod.ReceiverType.PROXY : CustomPayloadMethod.ReceiverType.SERVER);
-            msg.setReceiverName(contactable.getName());
-            fillWithPayload(msg, message);
-            customPayloadObserver.onNext(msg);
-        } // TODO add queue and delivery this message later
+        customPayloadClientSession.sendCustomPayload(channel, message, contactable);
     }
 
     @Override
     public void broadcastCustomPayload(String channel, Object message) {
-        if (customPayloadObserver != null) {
-            CustomPayloadMethod.CustomPayloadMessage msg = new CustomPayloadMethod.CustomPayloadMessage();
-            msg.setSenderType(CustomPayloadMethod.SenderType.SERVER);
-            msg.setSenderName(Objects.requireNonNull(getThisServerInformation()).getServerName());
-            msg.setChannel(channel);
-            msg.setReceiverType(CustomPayloadMethod.ReceiverType.ALL);
-            msg.setReceiverName("ALL");
-            fillWithPayload(msg, message);
-            customPayloadObserver.onNext(msg);
-        } // TODO add queue and delivery this message later
+        customPayloadClientSession.broadcastCustomPayload(channel, message);
     }
 
     public String getPublicToken() {
         return getConfigAdapter().getString("publicToken");
     }
 
+    /*
+     * This method is not only for hello, but also for update
+     */
     public void sayHello(BiConsumer<String, Server> callback) {
-        var call = getClient().initCall(HelloServerMethod.METHOD);
-        call.start(new ClientCall.Listener<>() {
+        getClient().initUnaryCall(HelloServerMethod.METHOD, new HelloServerMethod.HelloServerRequest(), new StreamObserver<>() {
             @Override
-            public void onMessage(HelloServerMethod.HelloServerResponse message) {
+            public void onNext(HelloServerMethod.HelloServerResponse message) {
                 if (getThisServerInformation() != null) {
                     if (!getThisServerInformation().getServerName().equals(message.getServerName())) {
                         getThisServerInformation().setPublicKey(null); // Whoa, we were changed to another server
@@ -125,55 +105,24 @@ public class ServerPlatform extends Platform {
                         s.setPublicKey(getPublicToken());
                     }
                 });
+                getServerManager().forEach(server -> {
+                    if (!message.getServers().contains(server.getServerName())) {
+                        getServerManager().removeServer(server);
+                    }
+                });
                 callback.accept("OK", getThisServerInformation());
             }
 
             @Override
-            public void onClose(Status status, Metadata trailers) {
-                if (status != Status.OK) {
-                    String message = "ERROR";
-                    if (status.getCause() != null) {
-                        message = status.getCause().getMessage();
-                    }
-                    callback.accept(message, null);
-                }
-            }
-        }, new Metadata());
-        call.sendMessage(new HelloServerMethod.HelloServerRequest());
-        call.halfClose();
-        call.request(1);
-    }
-
-    public void initCustomPayloadStream() {
-        customPayloadObserver = getClient().initStreamCall(CustomPayloadMethod.METHOD, new StreamObserver<>() {
-            @Override
-            public void onNext(CustomPayloadMethod.CustomPayloadMessage message) {
-                Object originalPayload = Platform.getInstance().getPayload(message);
-
-                getCustomPayloadManager().receiveMessage(resloveSender(message.getSenderType(), message.getSenderName()), message.getChannel(), originalPayload);
-            }
-
-            @Override
             public void onError(Throwable t) {
-                customPayloadObserver = null;
-                getLogger().warning("Custom Payload Stream went down! But don't worry, we will try revive this connection after some time!");
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    initCustomPayloadStream();
-                }).start();
-                sayHello((ok, s) -> {}); // maybe proxy was restarted and we need new data
+                callback.accept(t.getMessage(), null);
             }
 
             @Override
             public void onCompleted() {
-                customPayloadObserver = null;
+                // unused
             }
         });
-        sendCustomPayload("BungeeLink", new Handshake(), getCustomPayloadManager().getProxy());
     }
 
     public void selfUpdate() {
@@ -181,17 +130,13 @@ public class ServerPlatform extends Platform {
 
         getUpdateServerStatusDispatcher().fire(server);
 
-        var call = getClient().initCall(UpdateServerStatusMethod.METHOD);
         var req = new UpdateServerStatusMethod.UpdateServerStatusRequest();
         req.setCurrentPlayersCount(server.getOnlinePlayersCount());
         req.setMaximumPlayersCount(server.getMaximumPlayersCount());
         req.setServerStatus(ServerStatus.OPEN);
         req.setStatusString(server.getStatusLine());
-        call.start(new ClientCall.Listener<>() {
-        }, new Metadata());
-        call.sendMessage(req);
-        call.halfClose();
-        call.request(1);
+
+        getClient().initUnaryCall(UpdateServerStatusMethod.METHOD, req);
     }
 
     @Override
@@ -224,39 +169,26 @@ public class ServerPlatform extends Platform {
 
     @Override
     public void getPlayerServer(@NotNull UUID uuid, @NotNull Consumer<org.screamingsandals.bungeelink.api.servers.Server> consumer) {
-        var call = getClient().initCall(GetPlayerServerMethod.METHOD);
-        var req = new GetPlayerServerMethod.GetPlayerServerRequest();
-        req.setPlayerUuid(uuid);
-        call.start(new ClientCall.Listener<>() {
+        getClient().initUnaryCall(GetPlayerServerMethod.METHOD, new GetPlayerServerMethod.GetPlayerServerRequest(uuid), new StreamObserver<>() {
             @Override
-            public void onMessage(GetPlayerServerMethod.GetPlayerServerResponse message) {
+            public void onNext(GetPlayerServerMethod.GetPlayerServerResponse message) {
                 consumer.accept(getServerManager().getServer(message.getServerName()));
             }
 
             @Override
-            public void onClose(Status status, Metadata trailers) {
-                if (status != Status.OK) {
-                    consumer.accept(null);
-                }
+            public void onError(Throwable t) {
+                consumer.accept(null);
             }
-        }, new Metadata());
-        call.sendMessage(req);
-        call.halfClose();
-        call.request(1);
+
+            @Override
+            public void onCompleted() {
+                // unused
+            }
+        });
     }
 
     @Override
     public void changePlayerServer(@NotNull UUID uuid, org.screamingsandals.bungeelink.api.servers.@NotNull Server server) {
-        var call = getClient().initCall(SendPlayerMethod.METHOD);
-        var req = new SendPlayerMethod.SendPlayerRequest();
-        req.setPlayerUuid(uuid);
-        req.setDestination(server.getServerName());
-
-        call.start(new ClientCall.Listener<>() {
-        }, new Metadata());
-        call.sendMessage(req);
-
-        call.halfClose();
-        call.request(1);
+        getClient().initUnaryCall(SendPlayerMethod.METHOD, new SendPlayerMethod.SendPlayerRequest(uuid, server.getServerName()));
     }
 }

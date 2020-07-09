@@ -3,4 +3,5 @@ dependencies {
     implementation project(':common')
     implementation project(':bungee')
     implementation project(':bukkit')
+    implementation project(':velocity')
 }

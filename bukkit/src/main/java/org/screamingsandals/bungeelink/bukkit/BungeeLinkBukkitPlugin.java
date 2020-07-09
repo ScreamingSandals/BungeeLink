@@ -50,7 +50,7 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
                 return;
             }
 
-            platform.initCustomPayloadStream();
+            platform.getCustomPayloadClientSession().init();
 
             server.setOnlinePlayersCount(Bukkit.getOnlinePlayers().size());
             server.setMaximumPlayersCount(Bukkit.getMaxPlayers());
@@ -89,9 +89,8 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
         if (signManager != null) {
             signManager.save();
         }
-        if (platform.getSyncer() != null) {
-            platform.getSyncer().shutdown();
-        }
+        platform.getSyncer().shutdown();
+        platform.getCustomPayloadClientSession().shutdown();
         if (platform.getClient() != null && platform.getClient().isRunning()) {
             platform.getClient().stop();
         }

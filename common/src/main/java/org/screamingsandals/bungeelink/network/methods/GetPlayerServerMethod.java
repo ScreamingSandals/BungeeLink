@@ -2,6 +2,7 @@ package org.screamingsandals.bungeelink.network.methods;
 
 import io.grpc.MethodDescriptor;
 import io.grpc.stub.StreamObserver;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.screamingsandals.bungeelink.Platform;
 import org.screamingsandals.bungeelink.network.server.BungeeLinkService;
@@ -13,8 +14,11 @@ import static org.screamingsandals.bungeelink.network.MarshallerUtil.marshallerF
 public class GetPlayerServerMethod {
 
     @Data
+    @AllArgsConstructor
     public static class GetPlayerServerRequest {
         UUID playerUuid;
+
+        public GetPlayerServerRequest() {}
     }
 
     @Data
