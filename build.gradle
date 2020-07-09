@@ -17,6 +17,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.screamingsandals.gradle.builder:screaming-plugin-builder:1.0.13'
+        classpath 'gradle.plugin.de.fuerstenau:BuildConfigPlugin:1.1.8'
     }
 }
 
@@ -24,10 +25,19 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'org.screamingsandals.gradle.builder'
 
+    repositories {
+        maven { url = 'https://repo.velocitypowered.com/snapshots/' }
+    }
+
     shadowJar {
         relocate 'org.screamingsandals.lib', 'org.screamingsandals.bungeelink.lib'
 
-        relocate 'com.google', 'org.screamingsandals.bungeelink.lib.google'
+        relocate 'com.google.common', 'org.screamingsandals.bungeelink.lib.google.common'
+        relocate 'com.google.errorprone', 'org.screamingsandals.bungeelink.lib.google.errorprone'
+        relocate 'com.google.gson', 'org.screamingsandals.bungeelink.lib.google.gson'
+        relocate 'com.google.j2objc', 'org.screamingsandals.bungeelink.lib.google.j2objc'
+        relocate 'com.google.thirdparty', 'org.screamingsandals.bungeelink.lib.google.thirdparty'
+
         relocate 'io.grpc', 'org.screamingsandals.bungeelink.lib.grpc'
         relocate 'io.netty', 'org.screamingsandals.bungeelink.lib.netty'
         relocate 'io.perfmark', 'org.screamingsandals.bungeelink.lib.perfmark'

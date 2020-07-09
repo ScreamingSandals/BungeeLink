@@ -1,6 +1,17 @@
+apply plugin: 'de.fuerstenau.buildconfig'
+
 dependencies {
     implementation project(':api')
     implementation project(':common')
-    implementation 'org.screamingsandals.lib:config:1.1.26'
-    compileOnly waterfall()
+    implementation 'org.screamingsandals.lib:config:1.1.27'
+    compileOnly 'com.velocitypowered:velocity-api:1.0.8'
+    annotationProcessor 'com.velocitypowered:velocity-api:1.0.8'
+}
+
+buildConfig {
+    version = project.version
+
+    clsName = 'VersionInfo'
+    packageName = 'org.screamingsandals.bungeelink.velocity'
+    charset = 'UTF-8'
 }

@@ -46,7 +46,7 @@ public abstract class Platform extends BungeeLinkAPI {
 
         loadDefaults();
         if (!getConfigAdapter().getBoolean("enabled")) {
-            getLogger().severe("Plugin needs to be configured! Locate config.yml file in BungeeLink folder");
+            getLogger().severe("Plugin needs to be configured! Locate config.yml (on velocity config.toml) file in BungeeLink folder");
             return false;
         }
 

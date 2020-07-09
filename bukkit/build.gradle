@@ -1,8 +1,8 @@
 dependencies {
     implementation project(':api')
     implementation project(':common')
-    implementation 'org.screamingsandals.lib:config:1.1.26'
-    implementation 'org.screamingsandals.lib:signs:1.1.26'
+    implementation 'org.screamingsandals.lib:config:1.1.27'
+    implementation 'org.screamingsandals.lib:signs:1.1.27'
     compileOnly paper()
 }
 
