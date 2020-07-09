@@ -1,4 +1,8 @@
+rootProject.name = 'BungeeLink'
+
 include 'api'
 include 'common'
 include 'bukkit'
 include 'bungee'
+include 'universal'
+

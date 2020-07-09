@@ -1,2 +1,17 @@
 dependencies {
+    implementation project(':api')
+    implementation project(':common')
+    implementation 'org.screamingsandals.lib:config:1.1.26'
+    implementation 'org.screamingsandals.lib:signs:1.1.26'
+    compileOnly paper()
+}
+
+project.tasks.getByName('detectSpigotMain').enabled = true
+project.tasks.getByName('generateSpigotDescription').enabled = true
+
+spigot {
+    name 'BungeeLink'
+    authors 'ScreamingSandals'
+    apiVersion '1.13'
+    load STARTUP
 }

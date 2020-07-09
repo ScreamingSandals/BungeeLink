@@ -8,15 +8,15 @@ allprojects {
 buildscript {
     repositories {
         jcenter()
-	maven {
-          url = "https://plugins.gradle.org/m2/"
+        maven {
+            url = "https://plugins.gradle.org/m2/"
         }
         maven {
             url = 'https://repo.screamingsandals.org'
         }
     }
     dependencies {
-	classpath 'org.screamingsandals.gradle.builder:screaming-plugin-builder:1.0.10'
+        classpath 'org.screamingsandals.gradle.builder:screaming-plugin-builder:1.0.12'
     }
 }
 
@@ -25,7 +25,21 @@ subprojects {
     apply plugin: 'org.screamingsandals.gradle.builder'
 
     shadowJar {
-	relocate 'org.screamingsandals.lib', 'org.screamingsandals.bungeelink.lib'
+        relocate 'org.screamingsandals.lib', 'org.screamingsandals.bungeelink.lib'
+
+        relocate 'com.google', 'org.screamingsandals.bungeelink.lib.google'
+        relocate 'io.grpc', 'org.screamingsandals.bungeelink.lib.grpc'
+        relocate 'io.netty', 'org.screamingsandals.bungeelink.lib.netty'
+        relocate 'io.perfmark', 'org.screamingsandals.bungeelink.lib.perfmark'
+
+        exclude '/org/codehaus/mojo/**'
+        exclude '/org/checkerframework/checker/**'
+        exclude '/javax/annotation/**'
+        exclude '/android/**'
+        exclude '/module-info.class'
+        exclude '/META-INF/services/io.grpc.**'
+
+        archiveFileName = "BungeeLink-${baseName}-${version}-${classifier}.${extension}"
     }
 
     sourceCompatibility = '11'

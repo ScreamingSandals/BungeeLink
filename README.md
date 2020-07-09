@@ -1,2 +1,2 @@
-# BungeeLink
-Simple BungeeCord/Spigot plugin that allows players to connect via signs and GUIs.
+# [WIP] BungeeLink
+A simple plugin that allows easy communication between Spigot servers and BungeeCord proxy.

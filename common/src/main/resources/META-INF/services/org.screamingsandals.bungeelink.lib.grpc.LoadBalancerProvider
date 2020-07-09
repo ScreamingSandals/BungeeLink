@@ -1,0 +1,2 @@
+org.screamingsandals.bungeelink.lib.grpc.internal.PickFirstLoadBalancerProvider
+org.screamingsandals.bungeelink.lib.grpc.util.SecretRoundRobinLoadBalancerProvider$Provider
