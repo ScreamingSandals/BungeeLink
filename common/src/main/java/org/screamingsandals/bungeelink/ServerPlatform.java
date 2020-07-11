@@ -138,6 +138,7 @@ public class ServerPlatform extends Platform {
         req.setCurrentPlayersCount(server.getOnlinePlayersCount());
         req.setMaximumPlayersCount(server.getMaximumPlayersCount());
         req.setServerStatus(ServerStatus.OPEN);
+        req.setMotd(server.getMotd());
         req.setThirdPartyInformation(server.getThirdPartyInformationHolder().toMap());
 
         getClient().initUnaryCall(UpdateServerStatusMethod.METHOD, req);

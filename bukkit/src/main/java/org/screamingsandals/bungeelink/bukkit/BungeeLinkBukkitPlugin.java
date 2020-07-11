@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.screamingsandals.bungeelink.ServerPlatform;
 import org.screamingsandals.bungeelink.api.servers.ServerStatus;
+import org.screamingsandals.bungeelink.bukkit.hooks.HookManager;
 import org.screamingsandals.bungeelink.bukkit.listeners.PlayerListener;
 import org.screamingsandals.lib.config.ConfigAdapter;
 import org.screamingsandals.lib.config.SpigotConfigAdapter;
@@ -77,6 +78,8 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
                     ioException.printStackTrace();
                 }
             }
+
+            Bukkit.getScheduler().runTask(this, () -> HookManager.hook(server));
         });
 
     }

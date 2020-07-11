@@ -35,10 +35,12 @@ public class CustomPayloadClientSession {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        init();
+                        if (platform.getClient().isRunning()) {
+                            init();
+                            platform.sayHello((ok, s) -> {
+                            }); // maybe proxy was restarted and we need new data
+                        }
                     }).start();
-                    platform.sayHello((ok, s) -> {
-                    }); // maybe proxy was restarted and we need new data
                 }
 
                 @Override
@@ -78,6 +80,7 @@ public class CustomPayloadClientSession {
     public void shutdown() {
         if (customPayloadObserver != null) {
             customPayloadObserver.onCompleted();
+            customPayloadObserver = null;
         }
     }
 }

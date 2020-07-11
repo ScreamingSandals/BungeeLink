@@ -66,6 +66,7 @@ public class ServerStatusSyncer {
     public void shutdown() {
         if (statusObserver != null) {
             statusObserver.onCompleted();
+            statusObserver = null;
         }
         registeredServers.clear();
     }
