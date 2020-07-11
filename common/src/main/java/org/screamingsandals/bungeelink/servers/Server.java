@@ -10,7 +10,8 @@ import org.screamingsandals.bungeelink.network.methods.CustomPayloadMethod;
 public class Server implements org.screamingsandals.bungeelink.api.servers.Server {
     private final String serverName;
     private ServerStatus serverStatus = ServerStatus.CLOSED;
-    private String statusLine = "A BungeeLink server";
+    private String motd = "A BungeeLink server";
+    private ServerThirdPartyInformationHolder thirdPartyInformationHolder = new ServerThirdPartyInformationHolder();
     private int onlinePlayersCount;
     private int maximumPlayersCount;
 

@@ -11,6 +11,9 @@ import org.screamingsandals.bungeelink.network.Constants;
 import org.screamingsandals.bungeelink.network.server.BungeeLinkService;
 import org.screamingsandals.bungeelink.servers.Server;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import static org.screamingsandals.bungeelink.network.MarshallerUtil.marshallerFor;
 
 public class ServerStatusMethod {
@@ -27,10 +30,11 @@ public class ServerStatusMethod {
     @Data
     public static class ServerStatusResponse {
         String name;
-        String statusString;
+        String motd;
         ServerStatus serverStatus = ServerStatus.CLOSED;
         int currentPlayerCount;
         int maximumPlayerCount;
+        Map<String, String> thirdPartyInformation;
     }
 
     public static final MethodDescriptor<ServerStatusRequest, ServerStatusResponse> METHOD =
@@ -43,18 +47,38 @@ public class ServerStatusMethod {
                     .setSampledToLocalTracing(true)
                     .build();
 
-    // TODO: remake this shit
     public static StreamObserver<ServerStatusRequest> onRequest(StreamObserver<ServerStatusResponse> responseObserver) {
         String whoAsked = Constants.CONTEXT_PUBLIC_TOKEN.get();
+
+        var servers = new ArrayList<Server>();
+
+        var listener = new UpdateServerStatusListener() {
+            @Override
+            public void onUpdate(Server server) {
+                if (servers.contains(server)) {
+                    try {
+                        ServerStatusResponse res = new ServerStatusResponse();
+                        res.name = server.getServerName();
+                        res.motd = server.getMotd();
+                        res.thirdPartyInformation = server.getThirdPartyInformationHolder().toMap();
+                        res.serverStatus = server.getServerStatus();
+                        res.currentPlayerCount = server.getOnlinePlayersCount();
+                        res.maximumPlayerCount = server.getMaximumPlayersCount();
+                        responseObserver.onNext(res);
+                    } catch (Throwable ignored) {
+                        // Unregister listener on fail
+                        Platform.getInstance().getUpdateServerStatusDispatcher().unregister(this);
+                        Platform.getInstance().getUpdateServerStatusDispatcher().unregister(whoAsked,this);
+                    }
+                }
+            }
+        };
+
+        Platform.getInstance().getUpdateServerStatusDispatcher().register(listener);
 
         return new StreamObserver<>() {
             @Override
             public void onNext(ServerStatusRequest request) {
-                if (request.requestType == RequestType.STOP) {
-                    responseObserver.onCompleted();
-                    return;
-                }
-
                 Server server = Platform.getInstance().getServerManager().getServer(request.name);
                 if (server == null) {
                     responseObserver.onError(new IllegalStateException("Server with name " + request.name + " doesn't exist!"));
@@ -62,61 +86,39 @@ public class ServerStatusMethod {
                 }
 
                 if (request.requestType == RequestType.REGISTER) {
-                    ServerStatusResponse response = new ServerStatusResponse();
-                    response.name = request.name;
-                    response.statusString = server.getStatusLine();
-                    response.serverStatus = server.getServerStatus();
-                    response.currentPlayerCount = server.getOnlinePlayersCount();
-                    response.maximumPlayerCount = server.getMaximumPlayersCount();
-                    responseObserver.onNext(response);
+                    if (!servers.contains(server)) {
+                        servers.add(server);
 
-                    var listener = new UpdateServerStatusListener() {
-                        @Override
-                        public void onUpdate(Server server) {
-                            try {
-                                ServerStatusResponse res = new ServerStatusResponse();
-                                res.name = request.name;
-                                res.statusString = server.getStatusLine();
-                                res.serverStatus = server.getServerStatus();
-                                res.currentPlayerCount = server.getOnlinePlayersCount();
-                                res.maximumPlayerCount = server.getMaximumPlayersCount();
-                                responseObserver.onNext(res);
-                            } catch (Throwable ignored) {
-                                // Unregister listener on fail
-                                Platform.getInstance().getUpdateServerStatusDispatcher().unregister(server, this);
-                                Platform.getInstance().getUpdateServerStatusDispatcher().unregister(whoAsked, this);
-                            }
-                        }
-                    };
-
-                    Platform.getInstance().getUpdateServerStatusDispatcher().register(server, listener);
-                    Platform.getInstance().getUpdateServerStatusDispatcher().register(whoAsked, listener);
+                        ServerStatusResponse res = new ServerStatusResponse();
+                        res.name = server.getServerName();
+                        res.motd = server.getMotd();
+                        res.thirdPartyInformation = server.getThirdPartyInformationHolder().toMap();
+                        res.serverStatus = server.getServerStatus();
+                        res.currentPlayerCount = server.getOnlinePlayersCount();
+                        res.maximumPlayerCount = server.getMaximumPlayersCount();
+                        responseObserver.onNext(res);
+                    }
                 } else {
-                    var listeners = Platform.getInstance().getUpdateServerStatusDispatcher().getListenersByServer(server);
-                    listeners.forEach(updateServerStatusListener -> {
-                        if (Platform.getInstance().getUpdateServerStatusDispatcher().doesListenerBelongToToken(updateServerStatusListener, whoAsked)) {
-                            Platform.getInstance().getUpdateServerStatusDispatcher().unregister(server, updateServerStatusListener);
-                            Platform.getInstance().getUpdateServerStatusDispatcher().unregister(whoAsked, updateServerStatusListener);
-                        }
-                    });
+                    servers.remove(server);
                 }
             }
 
             @Override
             public void onError(Throwable t) {
-
+                Platform.getInstance().getUpdateServerStatusDispatcher().unregister(listener);
+                Platform.getInstance().getUpdateServerStatusDispatcher().unregister(whoAsked, listener);
             }
 
             @Override
             public void onCompleted() {
-
+                Platform.getInstance().getUpdateServerStatusDispatcher().unregister(listener);
+                Platform.getInstance().getUpdateServerStatusDispatcher().unregister(whoAsked, listener);
             }
         };
     }
 
     public enum RequestType {
         REGISTER,
-        UNREGISTER,
-        STOP;
+        UNREGISTER;
     }
 }

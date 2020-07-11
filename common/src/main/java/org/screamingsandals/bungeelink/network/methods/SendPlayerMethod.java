@@ -44,7 +44,7 @@ public class SendPlayerMethod {
             responseObserver.onError(new IllegalStateException("Provided server is not valid!"));
             return;
         }
-        ((ProxyPlatform) Platform.getInstance()).getSendPlayerToServer().accept(request.getPlayerUuid(), server);
+        ((ProxyPlatform) Platform.getInstance()).getChangePlayerServerFeature().changePlayerServer(request.getPlayerUuid(), server);
         responseObserver.onNext(new SendPlayerResponse());
         responseObserver.onCompleted();
     }

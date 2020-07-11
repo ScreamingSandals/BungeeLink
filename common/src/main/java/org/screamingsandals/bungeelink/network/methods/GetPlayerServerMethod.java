@@ -31,7 +31,7 @@ public class GetPlayerServerMethod {
                     marshallerFor(GetPlayerServerRequest.class),
                     marshallerFor(GetPlayerServerResponse.class))
                     .setFullMethodName(
-                            MethodDescriptor.generateFullMethodName(BungeeLinkService.SERVICE_NAME, "VerifyPlayer"))
+                            MethodDescriptor.generateFullMethodName(BungeeLinkService.SERVICE_NAME, "GetPlayerServer"))
                     .setType(MethodDescriptor.MethodType.UNARY)
                     .setSampledToLocalTracing(true)
                     .build();

@@ -57,7 +57,7 @@ public class ServerPlatform extends Platform {
                 .put("publicToken", Encryption.randomString(40))
                 .open("sign", sign -> {
                     sign.put("enabled", true)
-                            .put("contents",  List.of("§7[BungeeLink]", "%name%", "%statusline%", "%online%/%max%"));
+                            .put("contents",  List.of("§7[BungeeLink]", "%name%", "%motd%", "%online%/%max%"));
                 })
                 .put("verifyUsers", true)
                 .end();
@@ -125,6 +125,10 @@ public class ServerPlatform extends Platform {
         });
     }
 
+    public void sayBye() {
+        getClient().initUnaryCall(ByeServerMethod.METHOD, new ByeServerMethod.ByeServerRequest());
+    }
+
     public void selfUpdate() {
         var server = getServerManager().getServerByPublicKey(getPublicToken());
 
@@ -134,7 +138,7 @@ public class ServerPlatform extends Platform {
         req.setCurrentPlayersCount(server.getOnlinePlayersCount());
         req.setMaximumPlayersCount(server.getMaximumPlayersCount());
         req.setServerStatus(ServerStatus.OPEN);
-        req.setStatusString(server.getStatusLine());
+        req.setThirdPartyInformation(server.getThirdPartyInformationHolder().toMap());
 
         getClient().initUnaryCall(UpdateServerStatusMethod.METHOD, req);
     }
@@ -190,5 +194,10 @@ public class ServerPlatform extends Platform {
     @Override
     public void changePlayerServer(@NotNull UUID uuid, org.screamingsandals.bungeelink.api.servers.@NotNull Server server) {
         getClient().initUnaryCall(SendPlayerMethod.METHOD, new SendPlayerMethod.SendPlayerRequest(uuid, server.getServerName()));
+    }
+
+    @Override
+    public void kickPlayerFromProxy(@NotNull UUID uuid, @Nullable String reason) {
+        getClient().initUnaryCall(KickPlayerMethod.METHOD, new KickPlayerMethod.KickPlayerRequest(uuid, reason));
     }
 }

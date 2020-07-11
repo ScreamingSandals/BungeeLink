@@ -54,7 +54,7 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
 
             server.setOnlinePlayersCount(Bukkit.getOnlinePlayers().size());
             server.setMaximumPlayersCount(Bukkit.getMaxPlayers());
-            server.setStatusLine(Bukkit.getMotd());
+            server.setMotd(Bukkit.getMotd());
             server.setServerStatus(ServerStatus.OPEN);
 
             getServer().getPluginManager().registerEvents(new PlayerListener(), this);
@@ -72,9 +72,7 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
 
                     getServer().getPluginManager().registerEvents(new SignListener(signOwner, signManager), this);
 
-                    platform.getUpdateServerStatusDispatcher().register(server1 -> {
-                        signManager.getSignsForName(server1.getServerName()).forEach(signOwner::updateSign);
-                    });
+                    platform.getUpdateServerStatusDispatcher().register(server1 -> signManager.getSignsForName(server1.getServerName()).forEach(signOwner::updateSign));
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -92,6 +90,7 @@ public class BungeeLinkBukkitPlugin extends JavaPlugin {
         platform.getSyncer().shutdown();
         platform.getCustomPayloadClientSession().shutdown();
         if (platform.getClient() != null && platform.getClient().isRunning()) {
+            platform.sayBye();
             platform.getClient().stop();
         }
     }

@@ -8,6 +8,8 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.SneakyThrows;
+import net.kyori.text.Component;
+import net.kyori.text.TextComponent;
 import org.screamingsandals.bungeelink.ProxyPlatform;
 import org.screamingsandals.bungeelink.servers.Server;
 import org.screamingsandals.bungeelink.velocity.util.LoggerWrapper;
@@ -48,21 +50,26 @@ public class BungeeLinkVelocityPlugin {
             return;
         }
 
-        platform.setGetPlayerServerCallback(uuid -> {
+        platform.setGetPlayerServerFeature(uuid -> {
             var player = proxyServer.getPlayer(uuid);
             if (player.isPresent() && player.get().getCurrentServer().isPresent()) {
-                return player.get().getCurrentServer().get().getServer().getServerInfo().getName();
+                return platform.getServerByName(player.get().getCurrentServer().get().getServer().getServerInfo().getName());
             }
             return null;
         });
 
-        platform.setSendPlayerToServer((uuid, server) -> {
+        platform.setChangePlayerServerFeature((uuid, server) -> {
             var player = proxyServer.getPlayer(uuid);
             var s = proxyServer.getServer(server.getServerName());
             if (player.isPresent() && s.isPresent()) {
                 player.get().createConnectionRequest(s.get());
             }
         });
+
+        platform.setKickPlayerFeature(((uuid, reason) -> {
+            var player = proxyServer.getPlayer(uuid);
+            player.ifPresent(value -> value.disconnect(TextComponent.of(reason != null ? reason : "You were kicked by BungeeLink")));
+        }));
 
         proxyServer.getAllServers().forEach((server) -> {
             Server serverInstance = new Server(server.getServerInfo().getName());

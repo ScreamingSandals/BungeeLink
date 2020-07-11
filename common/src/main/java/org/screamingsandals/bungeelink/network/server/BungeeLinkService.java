@@ -17,6 +17,8 @@ public class BungeeLinkService implements BindableService {
         ssd.addMethod(GetPlayerServerMethod.METHOD, ServerCalls.asyncUnaryCall(GetPlayerServerMethod::onRequest));
         ssd.addMethod(SendPlayerMethod.METHOD, ServerCalls.asyncUnaryCall(SendPlayerMethod::onRequest));
         ssd.addMethod(CustomPayloadMethod.METHOD, ServerCalls.asyncBidiStreamingCall(CustomPayloadMethod::onRequest));
+        ssd.addMethod(KickPlayerMethod.METHOD, ServerCalls.asyncUnaryCall(KickPlayerMethod::onRequest));
+        ssd.addMethod(ByeServerMethod.METHOD, ServerCalls.asyncUnaryCall(ByeServerMethod::onRequest));
         return ssd.build();
     }
 }

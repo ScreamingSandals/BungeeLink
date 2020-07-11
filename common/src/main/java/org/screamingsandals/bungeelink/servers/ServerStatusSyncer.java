@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.screamingsandals.bungeelink.ServerPlatform;
 import org.screamingsandals.bungeelink.network.methods.ServerStatusMethod;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class ServerStatusSyncer {
@@ -29,10 +26,11 @@ public class ServerStatusSyncer {
             @Override
             public void onNext(ServerStatusMethod.ServerStatusResponse message) {
                 Server receivedServer = platform.getServerManager().getServer(message.getName());
+                receivedServer.setMotd(message.getMotd());
                 receivedServer.setOnlinePlayersCount(message.getCurrentPlayerCount());
                 receivedServer.setMaximumPlayersCount(message.getMaximumPlayerCount());
                 receivedServer.setServerStatus(message.getServerStatus());
-                receivedServer.setStatusLine(message.getStatusString());
+                receivedServer.getThirdPartyInformationHolder().switchMap(new HashMap<>(message.getThirdPartyInformation()));
                 platform.getUpdateServerStatusDispatcher().fire(receivedServer);
             }
 
@@ -67,7 +65,7 @@ public class ServerStatusSyncer {
 
     public void shutdown() {
         if (statusObserver != null) {
-            statusObserver.onNext(new ServerStatusMethod.ServerStatusRequest(ServerStatusMethod.RequestType.STOP, ""));
+            statusObserver.onCompleted();
         }
         registeredServers.clear();
     }

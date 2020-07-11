@@ -3,7 +3,11 @@ package org.screamingsandals.bungeelink;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.screamingsandals.bungeelink.api.custom.Contactable;
+import org.screamingsandals.bungeelink.features.proxy.ChangePlayerServerFeature;
+import org.screamingsandals.bungeelink.features.proxy.GetPlayerServerFeature;
+import org.screamingsandals.bungeelink.features.proxy.KickPlayerFeature;
 import org.screamingsandals.bungeelink.network.methods.CustomPayloadMethod;
 import org.screamingsandals.bungeelink.network.server.BungeeLinkServer;
 import org.screamingsandals.bungeelink.servers.Server;
@@ -12,17 +16,17 @@ import org.screamingsandals.lib.config.DefaultConfigBuilder;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @Getter
 public class ProxyPlatform extends Platform {
     private BungeeLinkServer server;
     @Setter
-    private Function<UUID, String> getPlayerServerCallback;
+    private GetPlayerServerFeature getPlayerServerFeature;
     @Setter
-    private BiConsumer<UUID, Server> sendPlayerToServer;
+    private KickPlayerFeature kickPlayerFeature;
+    @Setter
+    private ChangePlayerServerFeature changePlayerServerFeature;
 
     @Override
     public boolean init() {
@@ -71,13 +75,17 @@ public class ProxyPlatform extends Platform {
 
     @Override
     public void getPlayerServer(@NotNull UUID uuid, @NotNull Consumer<org.screamingsandals.bungeelink.api.servers.Server> consumer) {
-        var serverName = getPlayerServerCallback.apply(uuid);
-        var server = getServerManager().getServer(serverName);
+        var server = getPlayerServerFeature.getPlayerServer(uuid);
         consumer.accept(server);
     }
 
     @Override
     public void changePlayerServer(@NotNull UUID uuid, org.screamingsandals.bungeelink.api.servers.@NotNull Server server) {
-        sendPlayerToServer.accept(uuid, (Server) server);
+        changePlayerServerFeature.changePlayerServer(uuid, (Server) server);
+    }
+
+    @Override
+    public void kickPlayerFromProxy(@NotNull UUID uuid, @Nullable String reason) {
+        kickPlayerFeature.kickPlayer(uuid, reason);
     }
 }

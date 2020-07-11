@@ -23,6 +23,8 @@ public abstract class BungeeLinkAPI {
 
     public abstract void changePlayerServer(@NotNull UUID uuid, @NotNull Server server);
 
+    public abstract void kickPlayerFromProxy(@NotNull UUID uuid, @Nullable String reason);
+
     @NotNull
     public abstract CustomPayloadManager getCustomPayloadManager();
 

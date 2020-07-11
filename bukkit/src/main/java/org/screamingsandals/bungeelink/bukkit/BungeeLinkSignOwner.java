@@ -29,8 +29,11 @@ public class BungeeLinkSignOwner implements SignOwner {
                     var nline = line.replace("%name%", server.getServerName())
                             .replace("%online%", String.valueOf(server.getOnlinePlayersCount()))
                             .replace("%max%", String.valueOf(server.getMaximumPlayersCount()))
-                            .replace("%statusline%", server.getStatusLine())
-                            .replace("%status%", server.getServerStatus().name());
+                            .replace("%status%", server.getServerStatus().name())
+                            .replace("%motd%", server.getMotd());
+                    for (var entry : server.getThirdPartyInformationHolder()) {
+                        nline = nline.replace("%custom." + entry.getKey() + "%", entry.getValue());
+                    }
                     signBlock.setLine(i, nline);
                     i++;
                 }

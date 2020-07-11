@@ -2,11 +2,14 @@ package org.screamingsandals.bungeelink.bungee;
 
 import kr.entree.spigradle.annotations.PluginMain;
 import lombok.SneakyThrows;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.screamingsandals.bungeelink.ProxyPlatform;
 import org.screamingsandals.bungeelink.servers.Server;
 import org.screamingsandals.lib.config.BungeeConfigAdapter;
 import org.screamingsandals.lib.config.ConfigAdapter;
+import org.w3c.dom.Text;
 
 import java.io.File;
 
@@ -30,21 +33,28 @@ public class BungeeLinkBungeePlugin extends Plugin {
             return;
         }
 
-        platform.setGetPlayerServerCallback(uuid -> {
+        platform.setGetPlayerServerFeature(uuid -> {
             var player = getProxy().getPlayer(uuid);
             if (player != null && player.getServer() != null) {
-                return player.getServer().getInfo().getName();
+                return platform.getServerByName(player.getServer().getInfo().getName());
             }
             return null;
         });
 
-        platform.setSendPlayerToServer((uuid, server) -> {
+        platform.setChangePlayerServerFeature((uuid, server) -> {
             var player = getProxy().getPlayer(uuid);
             var s = getProxy().getServerInfo(server.getServerName());
             if (player != null && s != null) {
                 player.connect(s);
             }
         });
+
+        platform.setKickPlayerFeature(((uuid, reason) -> {
+            var player = getProxy().getPlayer(uuid);
+            if (player != null) {
+                player.disconnect(TextComponent.fromLegacyText(reason != null ? reason : "You were kicked by BungeeLink"));
+            }
+        }));
 
         getProxy().getServersCopy().forEach((name, server) -> {
             Server serverInstance = new Server(name);

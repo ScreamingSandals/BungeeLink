@@ -11,15 +11,16 @@ public interface Server extends Contactable {
     ServerStatus getServerStatus();
 
     @NotNull
-    String getStatusLine();
-
-    void setStatusLine(@NotNull String statusLine);
+    String getMotd();
 
     void setServerStatus(@NotNull ServerStatus serverStatus);
 
     int getOnlinePlayersCount();
 
     int getMaximumPlayersCount();
+
+    @NotNull
+    ServerThirdPartyInformationHolder getThirdPartyInformationHolder();
 
     @Override
     default String getName() {
