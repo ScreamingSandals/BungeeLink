@@ -6,7 +6,7 @@ dependencies {
     compileOnly paper()
 
     // Hooks, TODO: maybe make submodules for it
-    compileOnly 'org.screamingsandals.bedwars:BedWars-API:0.2.11'
+    compileOnly 'org.screamingsandals.bedwars:BedWars-API:0.2.12-SNAPSHOT'
 }
 
 project.tasks.getByName('detectSpigotMain').enabled = true

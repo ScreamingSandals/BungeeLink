@@ -16,7 +16,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'org.screamingsandals.gradle.builder:screaming-plugin-builder:1.0.13'
+        classpath 'org.screamingsandals.gradle.builder:screaming-plugin-builder:1.0.14'
         classpath 'gradle.plugin.de.fuerstenau:BuildConfigPlugin:1.1.8'
     }
 }
@@ -24,10 +24,6 @@ buildscript {
 subprojects {
     apply plugin: 'java'
     apply plugin: 'org.screamingsandals.gradle.builder'
-
-    repositories {
-        maven { url = 'https://repo.velocitypowered.com/snapshots/' }
-    }
 
     shadowJar {
         relocate 'org.screamingsandals.lib', 'org.screamingsandals.bungeelink.lib'
