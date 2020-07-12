@@ -42,28 +42,34 @@ public class CustomPayloadMethod {
         return new StreamObserver<>() {
             @Override
             public void onNext(CustomPayloadMessage request) {
-                Object originalPayload = Platform.getInstance().getPayload(request);
                 if (request.getReceiverType() == ReceiverType.PROXY) {
-                    Platform.getInstance().getCustomPayloadManager().receiveMessage(Platform.getInstance().resloveSender(request.getSenderType(), request.getSenderName()), request.getChannel(), originalPayload);
+                    Object originalPayload = Platform.getInstance().getPayload(request);
+                    if (originalPayload != null) {
+                        Platform.getInstance().getCustomPayloadManager().receiveMessage(Platform.getInstance().resloveSender(request.getSenderType(), request.getSenderName()), request.getChannel(), originalPayload);
+                    }
                 } else if (request.getReceiverType() == ReceiverType.SERVER) {
                     Server receiver = Platform.getInstance().getServerManager().getServer(request.getReceiverName());
                     if (receiver != null) {
-                        receiver.provideCustomPayloadToServer(request.getSenderType(), request.getSenderName(), request.getChannel(), originalPayload);
+                        receiver.provideCustomPayloadToServer(request);
                     }
                 } else {
-                    Platform.getInstance().getCustomPayloadManager().receiveMessage(Platform.getInstance().resloveSender(request.getSenderType(), request.getSenderName()), request.getChannel(), originalPayload);
-                    Platform.getInstance().getServerManager().forEach(server1 -> server1.provideCustomPayloadToServer(request.getSenderType(), request.getSenderName(), request.getChannel(), originalPayload));
+                    Platform.getInstance().getServerManager().forEach(server1 -> server1.provideCustomPayloadToServer(request));
+
+                    Object originalPayload = Platform.getInstance().getPayload(request);
+                    if (originalPayload != null) {
+                        Platform.getInstance().getCustomPayloadManager().receiveMessage(Platform.getInstance().resloveSender(request.getSenderType(), request.getSenderName()), request.getChannel(), originalPayload);
+                    }
                 }
             }
 
             @Override
             public void onError(Throwable t) {
-
+                server.setCustomPayloadMessageStreamObserver(null);
             }
 
             @Override
             public void onCompleted() {
-
+                server.setCustomPayloadMessageStreamObserver(null);
             }
         };
     }

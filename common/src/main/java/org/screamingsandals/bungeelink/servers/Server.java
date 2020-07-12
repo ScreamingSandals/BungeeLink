@@ -23,15 +23,19 @@ public class Server implements org.screamingsandals.bungeelink.api.servers.Serve
      * PROXY PLATFORM ONLY!!!!!
      */
     public void provideCustomPayloadToServer(CustomPayloadMethod.SenderType senderType, String senderName, String channel, Object message) {
+        CustomPayloadMethod.CustomPayloadMessage msg = new CustomPayloadMethod.CustomPayloadMessage();
+        msg.setSenderType(senderType);
+        msg.setSenderName(senderName);
+        msg.setChannel(channel);
+        msg.setReceiverType(CustomPayloadMethod.ReceiverType.SERVER);
+        msg.setReceiverName(serverName);
+        Platform.getInstance().fillWithPayload(msg, message);
+        provideCustomPayloadToServer(msg);
+    }
+
+    public void provideCustomPayloadToServer(CustomPayloadMethod.CustomPayloadMessage message) {
         if (customPayloadMessageStreamObserver != null) {
-            CustomPayloadMethod.CustomPayloadMessage msg = new CustomPayloadMethod.CustomPayloadMessage();
-            msg.setSenderType(senderType);
-            msg.setSenderName(senderName);
-            msg.setChannel(channel);
-            msg.setReceiverType(CustomPayloadMethod.ReceiverType.SERVER);
-            msg.setReceiverName(serverName);
-            Platform.getInstance().fillWithPayload(msg, message);
-            customPayloadMessageStreamObserver.onNext(msg);
-        }
+            customPayloadMessageStreamObserver.onNext(message);
+        } // TODO: put it to some queue
     }
 }

@@ -99,10 +99,13 @@ public abstract class Platform extends BungeeLinkAPI {
         message.setPayload(json);
     }
 
-    @SneakyThrows
     public Object getPayload(CustomPayloadMethod.CustomPayloadMessage message) {
         Gson gson = new Gson();
-        return gson.fromJson(message.getPayload(), Class.forName(message.getPayloadClassName()));
+        try {
+            return gson.fromJson(message.getPayload(), Class.forName(message.getPayloadClassName()));
+        } catch (ClassNotFoundException ignored) {
+        }
+        return null;
     }
 
     public Contactable resloveSender(CustomPayloadMethod.SenderType senderType, String senderName) {

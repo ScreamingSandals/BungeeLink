@@ -21,8 +21,9 @@ public class CustomPayloadClientSession {
                 @Override
                 public void onNext(CustomPayloadMethod.CustomPayloadMessage message) {
                     Object originalPayload = Platform.getInstance().getPayload(message);
-
-                    platform.getCustomPayloadManager().receiveMessage(platform.resloveSender(message.getSenderType(), message.getSenderName()), message.getChannel(), originalPayload);
+                    if (originalPayload != null) {
+                        platform.getCustomPayloadManager().receiveMessage(platform.resloveSender(message.getSenderType(), message.getSenderName()), message.getChannel(), originalPayload);
+                    }
                 }
 
                 @Override
