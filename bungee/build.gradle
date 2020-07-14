@@ -1,12 +1,12 @@
 dependencies {
-    implementation project(':api')
-    implementation project(':common')
-    implementation 'org.screamingsandals.lib:config:1.1.27'
+    shade project(':api')
+    shade project(':common')
+    shade 'org.screamingsandals.lib:config:1.1.27'
+    shade 'org.screamingsandals.lib:reflection:1.1.27'
     compileOnly waterfall()
 }
 
-project.tasks.getByName('detectBungeeMain').enabled = true
-project.tasks.getByName('generateBungeeDescription').enabled = true
+enableSpigradleBungee()
 
 bungee {
     name 'BungeeLink'

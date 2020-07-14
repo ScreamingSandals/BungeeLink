@@ -1,0 +1,5 @@
+prepareFabric('1.16.1', '1.16.1+build.1:v2', '0.8.8+build.202')
+
+dependencies {
+    shade project(':common')
+}

@@ -4,6 +4,7 @@ import io.grpc.stub.StreamObserver;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.screamingsandals.bungeelink.api.CurrentPlayerInformation;
 import org.screamingsandals.bungeelink.api.custom.Contactable;
 import org.screamingsandals.bungeelink.api.servers.ServerStatus;
 import org.screamingsandals.bungeelink.custom.CustomPayloadClientSession;
@@ -173,15 +174,21 @@ public class ServerPlatform extends Platform {
     }
 
     @Override
-    public void getPlayerServer(@NotNull UUID uuid, @NotNull Consumer<org.screamingsandals.bungeelink.api.servers.Server> consumer) {
-        getClient().initUnaryCall(GetPlayerServerMethod.METHOD, new GetPlayerServerMethod.GetPlayerServerRequest(uuid), new StreamObserver<>() {
+    public void getPlayerCredentials(@NotNull UUID uuid, @NotNull Consumer<CurrentPlayerInformation> consumer) {
+        getClient().initUnaryCall(GetPlayerCredentialsMethod.METHOD, new GetPlayerCredentialsMethod.GetPlayerCredentialsRequest(uuid), new StreamObserver<>() {
             @Override
-            public void onNext(GetPlayerServerMethod.GetPlayerServerResponse message) {
-                consumer.accept(getServerManager().getServer(message.getServerName()));
+            public void onNext(GetPlayerCredentialsMethod.GetPlayerCredentialsResponse message) {
+                PlayerInformation information = new PlayerInformation(message.getPlayerName(), uuid);
+                information.setAddress(message.getAddress());
+                information.setCurrentServer(getServerByName(message.getServerName()));
+                information.setPendingServer(getServerByName(message.getPendingServerName()));
+                consumer.accept(information);
             }
 
             @Override
             public void onError(Throwable t) {
+
+                t.printStackTrace();
                 consumer.accept(null);
             }
 

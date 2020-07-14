@@ -1,7 +1,8 @@
 dependencies {
-    implementation project(':api')
-    implementation project(':common')
-    implementation project(':bungee')
-    implementation project(':bukkit')
-    implementation project(':velocity')
+    shade project(':api')
+    shade project(':common')
+    shade project(':bungee')
+    shade project(':bukkit')
+    shade project(':velocity')
+    //shade project(':fabric') // it's not possible to build it inside
 }

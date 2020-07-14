@@ -4,9 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.screamingsandals.bungeelink.api.CurrentPlayerInformation;
 import org.screamingsandals.bungeelink.api.custom.Contactable;
 import org.screamingsandals.bungeelink.features.proxy.ChangePlayerServerFeature;
-import org.screamingsandals.bungeelink.features.proxy.GetPlayerServerFeature;
+import org.screamingsandals.bungeelink.features.proxy.GetPlayerCredentialsFeature;
 import org.screamingsandals.bungeelink.features.proxy.KickPlayerFeature;
 import org.screamingsandals.bungeelink.network.methods.CustomPayloadMethod;
 import org.screamingsandals.bungeelink.network.server.BungeeLinkServer;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 public class ProxyPlatform extends Platform {
     private BungeeLinkServer server;
     @Setter
-    private GetPlayerServerFeature getPlayerServerFeature;
+    private GetPlayerCredentialsFeature getPlayerCredentialsFeature;
     @Setter
     private KickPlayerFeature kickPlayerFeature;
     @Setter
@@ -74,9 +75,9 @@ public class ProxyPlatform extends Platform {
     }
 
     @Override
-    public void getPlayerServer(@NotNull UUID uuid, @NotNull Consumer<org.screamingsandals.bungeelink.api.servers.Server> consumer) {
-        var server = getPlayerServerFeature.getPlayerServer(uuid);
-        consumer.accept(server);
+    public void getPlayerCredentials(@NotNull UUID uuid, @NotNull Consumer<CurrentPlayerInformation> consumer) {
+        var credentials = getPlayerCredentialsFeature.getPlayerCredentials(uuid);
+        consumer.accept(credentials);
     }
 
     @Override

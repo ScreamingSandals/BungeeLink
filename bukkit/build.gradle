@@ -1,16 +1,15 @@
 dependencies {
-    implementation project(':api')
-    implementation project(':common')
-    implementation 'org.screamingsandals.lib:config:1.1.27'
-    implementation 'org.screamingsandals.lib:signs:1.1.27'
+    shade project(':api')
+    shade project(':common')
+    shade 'org.screamingsandals.lib:config:1.1.27'
+    shade 'org.screamingsandals.lib:signs:1.1.27'
     compileOnly paper()
 
     // Hooks, TODO: maybe make submodules for it
     compileOnly 'org.screamingsandals.bedwars:BedWars-API:0.2.12-SNAPSHOT'
 }
 
-project.tasks.getByName('detectSpigotMain').enabled = true
-project.tasks.getByName('generateSpigotDescription').enabled = true
+enableSpigradleSpigot()
 
 spigot {
     name 'BungeeLink'

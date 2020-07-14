@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "bungeelink",
+  "version": "${version}",
+
+  "name": "BungeeLink",
+  "description": "A simple plugin that allows easy communication between Minecraft servers and proxy.",
+  "authors": [
+    "ScreamingSandals"
+  ],
+  "contact": {
+    "sources": "https://github.com/ScreamingSandals/BungeeLink"
+  },
+
+  "license": "LGPL-3.0",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "org.screamingsandals.bungeelink.fabric.BungeeLinkFabricMod"
+    ]
+  },
+  "mixins": [
+  ],
+  "depends": {
+    "fabricloader": "*",
+    "fabric": "*",
+    "fabricproxy": "*"
+  },
+  "suggests": {}
+}

@@ -7,9 +7,10 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.ServerConnection;
 import lombok.SneakyThrows;
-import net.kyori.text.Component;
 import net.kyori.text.TextComponent;
+import org.screamingsandals.bungeelink.PlayerInformation;
 import org.screamingsandals.bungeelink.ProxyPlatform;
 import org.screamingsandals.bungeelink.servers.Server;
 import org.screamingsandals.bungeelink.velocity.util.LoggerWrapper;
@@ -20,6 +21,8 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+
+import static org.screamingsandals.lib.reflection.Reflection.fastInvoke;
 
 @Plugin(id = "bungeelink", name = "BungeeLink", version = VersionInfo.VERSION, authors = {"ScreamingSandals"})
 public class BungeeLinkVelocityPlugin {
@@ -50,10 +53,25 @@ public class BungeeLinkVelocityPlugin {
             return;
         }
 
-        platform.setGetPlayerServerFeature(uuid -> {
+        platform.setGetPlayerCredentialsFeature(uuid -> {
             var player = proxyServer.getPlayer(uuid);
             if (player.isPresent() && player.get().getCurrentServer().isPresent()) {
-                return platform.getServerByName(player.get().getCurrentServer().get().getServer().getServerInfo().getName());
+                var p = player.get();
+                var information = new PlayerInformation(p.getUsername(), uuid);
+                information.setAddress(p.getRemoteAddress());
+                p.getCurrentServer().ifPresent(serverConnection -> information.setCurrentServer(platform.getServerByName(serverConnection.getServerInfo().getName())));
+                // don't look velocity maintainers here
+                try {
+                    // a bit of reflection :O
+                    var connectionInFlight = (ServerConnection) fastInvoke(player, "getConnectionInFlight");
+                    if (connectionInFlight != null) {
+                        information.setPendingServer(platform.getServerByName(connectionInFlight.getServerInfo().getName()));
+                    }
+                } catch (Throwable t) {
+                    logger.error("Check if you have latest version of your Velocity proxy!");
+                    t.printStackTrace();
+                }
+                return information;
             }
             return null;
         });
@@ -62,7 +80,7 @@ public class BungeeLinkVelocityPlugin {
             var player = proxyServer.getPlayer(uuid);
             var s = proxyServer.getServer(server.getServerName());
             if (player.isPresent() && s.isPresent()) {
-                player.get().createConnectionRequest(s.get());
+                player.get().createConnectionRequest(s.get()).connect();
             }
         });
 

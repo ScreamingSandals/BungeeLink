@@ -6,4 +6,5 @@ include 'bukkit'
 include 'bungee'
 include 'universal'
 include 'velocity'
+include 'fabric'
 
