@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "org.screamingsandals.bungeelink.fabric.mixin",
+  "compatibilityLevel": "JAVA_11",
+  "mixins": [
+    "MinecraftServerMixin",
+    "LoginListenerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

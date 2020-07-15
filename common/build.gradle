@@ -2,7 +2,7 @@ dependencies {
     shade project(':api')
     shade 'io.grpc:grpc-stub:1.30.2'
     shade 'io.grpc:grpc-netty:1.30.2'
-    shade 'org.screamingsandals.lib:config:1.1.27'
+    shade 'org.screamingsandals.lib:config:1.1.28'
     shade 'com.google.code.gson:gson:2.8.0'
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53' // necessary for Java 9+
 }

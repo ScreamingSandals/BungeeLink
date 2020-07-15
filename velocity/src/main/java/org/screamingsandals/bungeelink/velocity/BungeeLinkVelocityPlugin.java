@@ -15,7 +15,7 @@ import org.screamingsandals.bungeelink.ProxyPlatform;
 import org.screamingsandals.bungeelink.servers.Server;
 import org.screamingsandals.bungeelink.velocity.util.LoggerWrapper;
 import org.screamingsandals.lib.config.ConfigAdapter;
-import org.screamingsandals.lib.config.VelocityConfigAdapter;
+import org.screamingsandals.lib.config.TomlConfigAdapter;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -45,8 +45,7 @@ public class BungeeLinkVelocityPlugin {
         platform.setLogger(new LoggerWrapper(logger));
 
         File file = ConfigAdapter.createFile(dataFolder.toFile(), "config.toml");
-        platform.setConfigAdapter(new VelocityConfigAdapter(file) {
-        });
+        platform.setConfigAdapter(TomlConfigAdapter.create(file));
 
         if (!platform.init()) {
             logger.error("Initialization failed! Disabling BungeeLink... Please look at previous message from BungeeLink to solve the problem!");

@@ -3,8 +3,8 @@ apply plugin: 'de.fuerstenau.buildconfig'
 dependencies {
     shade project(':api')
     shade project(':common')
-    shade 'org.screamingsandals.lib:config:1.1.27'
-    shade 'org.screamingsandals.lib:reflection:1.1.27'
+    shade 'org.screamingsandals.lib:config:1.1.28'
+    shade 'org.screamingsandals.lib:reflection:1.1.28'
     compileOnly velocity()
     annotationProcessor velocity()
 }
