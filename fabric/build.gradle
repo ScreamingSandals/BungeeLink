@@ -3,5 +3,5 @@ prepareFabric('1.16.1', '1.16.1+build.5:v2', '0.8.8+build.202')
 dependencies {
     shade project(':api')
     shade project(':common')
-    shade 'org.screamingsandals.lib:config:1.1.28'
+    shade 'org.screamingsandals.lib:config:1.1.31'
 }

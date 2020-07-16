@@ -6,9 +6,8 @@
     "MinecraftServerMixin",
     "LoginListenerMixin"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "refmap": "fabric-refmap.json"
 }

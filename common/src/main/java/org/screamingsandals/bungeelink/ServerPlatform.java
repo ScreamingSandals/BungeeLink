@@ -116,6 +116,7 @@ public class ServerPlatform extends Platform {
 
             @Override
             public void onError(Throwable t) {
+                t.printStackTrace();
                 callback.accept(t.getMessage(), null);
             }
 

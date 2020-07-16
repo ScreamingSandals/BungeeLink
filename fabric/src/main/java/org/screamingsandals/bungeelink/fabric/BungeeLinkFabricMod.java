@@ -2,7 +2,7 @@ package org.screamingsandals.bungeelink.fabric;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.fabricmc.api.DedicatedServerModInitializer;
+import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.logging.log4j.LogManager;
 import org.screamingsandals.bungeelink.ServerPlatform;
@@ -15,7 +15,7 @@ import java.io.File;
 import java.util.logging.Logger;
 
 @Getter
-public class BungeeLinkFabricMod implements DedicatedServerModInitializer {
+public class BungeeLinkFabricMod implements ModInitializer {
     @Getter
     private static BungeeLinkFabricMod instance;
     private final Logger logger = new LoggerWrapper(LogManager.getLogger());
@@ -26,14 +26,14 @@ public class BungeeLinkFabricMod implements DedicatedServerModInitializer {
 
     @SneakyThrows
     @Override
-    public void onInitializeServer() {
+    public void onInitialize() {
         instance = this;
 
         platform = new ServerPlatform();
         platform.setLogger(logger);
 
         // Setup working directory
-        dataFolder = new File(FabricLoader.getInstance().getConfigDirectory(), "worldedit");
+        dataFolder = new File(FabricLoader.getInstance().getConfigDirectory(), "bungeelink");
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
