@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;setFavicon(Lnet/minecraft/server/ServerMetadata;)V", ordinal = 0), method = "method_29741")
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/server/MinecraftServer;setFavicon(Lnet/minecraft/server/ServerMetadata;)V", ordinal = 0), method = "runServer")
     private void afterSetupServer(CallbackInfo info) {
-        BungeeLinkFabricMod.getInstance().onServerLoaded();
+        BungeeLinkFabricMod.getInstance().onServerLoaded((MinecraftServer) (Object) this); // Fucking dump Fabric cast trick. Why it looks so awful? XD
     }
 
     @Inject(at = @At("HEAD"), method = "shutdown")

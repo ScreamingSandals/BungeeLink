@@ -1,8 +1,8 @@
 dependencies {
     shade project(':api')
     shade project(':common')
-    shade screaming('config', '1.1.31')
-    shade screaming('reflection', '1.1.31')
+    shade screaming('config', '1.1.34')
+    shade screaming('reflection', '1.1.34')
     compileOnly waterfall()
 }
 

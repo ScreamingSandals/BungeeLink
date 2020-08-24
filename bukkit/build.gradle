@@ -1,8 +1,8 @@
 dependencies {
     shade project(':api')
     shade project(':common')
-    shade screaming('config', '1.1.31')
-    shade screaming('signs', '1.1.31')
+    shade screaming('config', '1.1.34')
+    shade screaming('signs', '1.1.34')
     compileOnly paper()
 
     // Hooks, TODO: maybe make submodules for it

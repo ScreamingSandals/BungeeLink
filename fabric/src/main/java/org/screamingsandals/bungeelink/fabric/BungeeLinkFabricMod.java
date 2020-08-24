@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 import org.apache.logging.log4j.LogManager;
 import org.screamingsandals.bungeelink.ServerPlatform;
 import org.screamingsandals.bungeelink.api.servers.ServerStatus;
@@ -47,7 +48,7 @@ public class BungeeLinkFabricMod implements ModInitializer {
         }
     }
 
-    public void onServerLoaded() {
+    public void onServerLoaded(MinecraftServer mc) {
         if (disabled || enabled) {
             return;
         }
@@ -63,12 +64,11 @@ public class BungeeLinkFabricMod implements ModInitializer {
 
             platform.getCustomPayloadClientSession().init();
 
-           /* server.setOnlinePlayersCount(Bukkit.getOnlinePlayers().size());
-            server.setMaximumPlayersCount(Bukkit.getMaxPlayers());
-            server.setMotd(Bukkit.getMotd());*/
+            server.setOnlinePlayersCount(mc.getCurrentPlayerCount());
+            server.setMaximumPlayersCount(mc.getMaxPlayerCount());
+            server.setMotd(mc.getServerMotd());
             server.setServerStatus(ServerStatus.OPEN);
 
-//            getServer().getPluginManager().registerEvents(new PlayerListener(), this);
             getLogger().info("BungeeLink has been initialized");
 
             platform.selfUpdate();
